@@ -28,8 +28,8 @@ export async function authenticate(
 
 const FormSchema = z.object({
   id: z.string(),
-  customerId: z.string({
-    invalid_type_error: 'Please select a customer.',
+  clientId: z.string({
+    invalid_type_error: 'Please select a client.',
   }),
   amount: z.coerce.number()
     .gt(0, { message: 'Please enter an amount greater than $0.' }),
@@ -44,7 +44,7 @@ const CreateInvoice = FormSchema.omit({ id: true, date: true });
 // This is temporary until @types/react-dom is updated
 export type State = {
   errors?: {
-    customerId?: string[];
+    clientId?: string[];
     amount?: string[];
     status?: string[];
   };
@@ -61,14 +61,14 @@ export async function createInvoice(prevState: State, formData: FormData) {
       message: 'Missing Fields. Failed to Create Invoice.',
     };
   }
-  const { customerId, amount, status } = validatedFields.data;
+  const { clientId, amount, status } = validatedFields.data;
 
   const amountInCents = amount * 100;
   const date = new Date().toISOString().split('T')[0];
   try {
     await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
-      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+      INSERT INTO invoices (client_id, amount, status, date)
+      VALUES (${clientId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
     return {
@@ -87,7 +87,7 @@ export async function updateInvoice(
   formData: FormData,
 ) {
   const validatedFields = UpdateInvoice.safeParse({
-    customerId: formData.get('customerId'),
+    clientId: formData.get('clientId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
@@ -99,13 +99,13 @@ export async function updateInvoice(
     };
   }
  
-  const { customerId, amount, status } = validatedFields.data;
+  const { clientId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
  
   try {
     await sql`
       UPDATE invoices
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
+      SET client_id = ${clientId}, amount = ${amountInCents}, status = ${status}
       WHERE id = ${id}
     `;
   } catch (error) {

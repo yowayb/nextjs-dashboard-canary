@@ -1,6 +1,6 @@
 'use client';
 
-import { CustomerField, InvoiceForm } from '@/app/lib/definitions';
+import { ClientField, InvoiceForm } from '@/app/lib/definitions';
 import { updateInvoice } from '@/app/lib/actions';
 
 import {
@@ -15,36 +15,36 @@ import { useFormState } from 'react-dom';
 
 export default function EditInvoiceForm({
   invoice,
-  customers,
+  clients,
 }: {
   invoice: InvoiceForm;
-  customers: CustomerField[];
+  clients: ClientField[];
 }) {
-  const initialState = { message: null, errors: {} };
+  const initialState = { message: "", errors: {} };
   const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
   const [state, dispatch] = useFormState(updateInvoiceWithId, initialState);
 
   return (
     <form action={dispatch}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+        {/* Client Name */}
         <div className="mb-4">
-          <label htmlFor="customer" className="mb-2 block text-sm font-medium">
-            Choose customer
+          <label htmlFor="client" className="mb-2 block text-sm font-medium">
+            Choose client
           </label>
           <div className="relative">
             <select
-              id="customer"
-              name="customerId"
+              id="client"
+              name="clientId"
               className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue={invoice.customer_id}
+              defaultValue={invoice.client_id}
             >
               <option value="" disabled>
-                Select a customer
+                Select a client
               </option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name}
                 </option>
               ))}
             </select>
