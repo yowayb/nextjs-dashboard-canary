@@ -56,7 +56,7 @@ export const invoices = pgTable(
   'invoices',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    client_id: text('client_id').notNull(),
+    client_id: uuid('client_id').notNull(),
     amount: numeric('amount', { precision: 15, scale: 2 }).notNull(),
     date: text('date').notNull(),
     status: invoiceStatusEnum('status').notNull(),
