@@ -3,7 +3,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "db:push": "npx drizzle-kit push",
-    "db:seed": "npx tsx -r dotenv/config ./scripts/seed.ts",
+    "db:seed": "npx tsx -r dotenv/config ./db/seed.ts",
     "build": "next build",
     "dev": "next dev",
     "prettier": "prettier --write --ignore-unknown .",
