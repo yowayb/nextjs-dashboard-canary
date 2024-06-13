@@ -8,7 +8,7 @@ import {
   NewInvoice,
   NewClient,
   NewRevenue,
-} from '@/drizzle/schema.js';
+} from '@/db/schema.js';
 const db = drizzle(sql);
 import bcrypt from 'bcrypt';
 

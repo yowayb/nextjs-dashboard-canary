@@ -28,7 +28,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/lib/placeholder-data.ts",
-    "scripts/seed.ts"
-, "drizzle/envConfig.ts"  ],
+    "scripts/seed.ts",
+    "db/envConfig.ts"
+  ],
   "exclude": ["node_modules"]
 }

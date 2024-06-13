@@ -72,6 +72,7 @@ export const clients = [
   },
 ];
 
+// TODO dedupe seed data
 export const invoices = [
   {
     client_id: clients[0].id,
