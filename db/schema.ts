@@ -12,6 +12,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
  
 export const users = pgTable(
   'users',
@@ -50,6 +51,10 @@ export const clients = pgTable(
 export type Client = typeof clients.$inferSelect;
 export type NewClient = typeof clients.$inferInsert;
 
+export const clientsRelations = relations(clients, ({ many }) => ({
+  invoices: many(invoices),
+}));
+
 export const invoiceStatusEnum = pgEnum('invoice_status', ['pending', 'paid']);
 
 export const invoices = pgTable(
@@ -65,6 +70,13 @@ export const invoices = pgTable(
 
 export type Invoice = typeof invoices.$inferSelect;
 export type NewInvoice = typeof invoices.$inferInsert;
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  client: one(clients, {
+    fields: [invoices.client_id],
+    references: [clients.id],
+  }),
+}));
 
 export const revenue = pgTable(
   'revenue',

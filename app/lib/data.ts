@@ -1,87 +1,57 @@
+import { unstable_noStore } from 'next/cache';
 import { sql } from '@vercel/postgres';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
 import {
   ClientField,
   ClientsTableType,
   InvoiceForm,
   InvoicesTable,
-  LatestInvoiceRaw,
   User,
-  Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
-import { unstable_noStore } from 'next/cache';
+import * as schema from '@/db/schema';
+import { count, desc } from 'drizzle-orm';
+const db = drizzle(sql, { schema });
 
 export async function fetchRevenue() {
-  // Add noStore() here to prevent the response from being cached.
-  // This is equivalent to in fetch(..., {cache: 'no-store'}).
   unstable_noStore();
-
-  try {
-    const data = await sql<Revenue>`SELECT * FROM revenue`;
-    return data.rows;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch revenue data.');
-  }
+  return await db.query.revenue.findMany();
 }
 
 export async function fetchLatestInvoices() {
   unstable_noStore();
-
-  try {
-    const data = await sql<LatestInvoiceRaw>`
-      SELECT invoices.amount, clients.name, clients.image_url, clients.email, invoices.id
-      FROM invoices
-      JOIN clients ON invoices.client_id = clients.id
-      ORDER BY invoices.date DESC
-      LIMIT 5`;
-
-    const latestInvoices = data.rows.map((invoice) => ({
-      ...invoice,
-      amount: formatCurrency(invoice.amount),
-    }));
-    return latestInvoices;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest invoices.');
-  }
+  const data = await db.query.invoices.findMany({
+    with: { client: true },
+    orderBy: [desc(schema.invoices.date)],
+    limit: 5
+  });
+  const latestInvoices = data.map((invoice) => ({
+    ...invoice,
+    amount: formatCurrency(Number(invoice.amount)),
+  }));
+  return latestInvoices;
 }
 
 export async function fetchCardData() {
   unstable_noStore();
+  const invoiceCount = await db.select({ count: count() }).from(schema.invoices);
+  const clientCount = await db.select({ count: count() }).from(schema.clients);
+  const invoiceStatus = await sql`SELECT
+    SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
+    SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
+    FROM invoices`;
 
-  try {
-    // You can probably combine these into a single SQL query
-    // However, we are intentionally splitting them to demonstrate
-    // how to initialize multiple queries in parallel with JS.
-    const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
-    const clientCountPromise = sql`SELECT COUNT(*) FROM clients`;
-    const invoiceStatusPromise = sql`SELECT
-         SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
-         SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
-         FROM invoices`;
+  const numberOfInvoices = Number(invoiceCount[0].count ?? '0');
+  const numberOfClients = Number(clientCount[0].count ?? '0');
+  const totalPaidInvoices = formatCurrency(invoiceStatus.rows[0].paid ?? '0');
+  const totalPendingInvoices = formatCurrency(invoiceStatus.rows[0].pending ?? '0');
 
-    const data = await Promise.all([
-      invoiceCountPromise,
-      clientCountPromise,
-      invoiceStatusPromise,
-    ]);
-
-    const numberOfInvoices = Number(data[0].rows[0].count ?? '0');
-    const numberOfClients = Number(data[1].rows[0].count ?? '0');
-    const totalPaidInvoices = formatCurrency(data[2].rows[0].paid ?? '0');
-    const totalPendingInvoices = formatCurrency(data[2].rows[0].pending ?? '0');
-
-    return {
-      numberOfClients: numberOfClients,
-      numberOfInvoices,
-      totalPaidInvoices,
-      totalPendingInvoices,
-    };
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch card data.');
-  }
+  return {
+    numberOfClients,
+    numberOfInvoices,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  };
 }
 
 const ITEMS_PER_PAGE = 6;
