@@ -1,18 +1,10 @@
-import { drizzle } from 'drizzle-orm/vercel-postgres';
 import { sql } from '@vercel/postgres';
-import {
-  integer,
-  numeric,
-  pgEnum,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  uniqueIndex,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { drizzle } from 'drizzle-orm/vercel-postgres';
+import { integer, numeric, pgEnum, pgTable, text, timestamp,
+  uniqueIndex, uuid, varchar, } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
  
 export const users = pgTable(
   'users',
@@ -33,8 +25,7 @@ export const users = pgTable(
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-export const clients = pgTable(
-  'clients',
+export const clients = pgTable('clients',
   {
     id: uuid('id').defaultRandom().primaryKey(),
     name: text('name').notNull(),
@@ -47,12 +38,29 @@ export const clients = pgTable(
     }
   }
 )
-
 export type Client = typeof clients.$inferSelect;
 export type NewClient = typeof clients.$inferInsert;
 
 export const clientsRelations = relations(clients, ({ many }) => ({
   invoices: many(invoices),
+  sites: many(sites),
+}));
+
+export const sites = pgTable('sites',
+  {
+    url: varchar('url').primaryKey(),
+    client_id: uuid('client_id').notNull(),
+  }
+)
+export type Site = typeof clients.$inferSelect;
+export type NewSite = typeof clients.$inferInsert;
+
+export const InsertSiteSchema = createInsertSchema(sites, {
+  url: z.string().url(),
+});
+
+export const sitesRelations = relations(sites, ({ one }) => ({
+  client_id: one(clients),
 }));
 
 export const invoiceStatusEnum = pgEnum('invoice_status', ['pending', 'paid']);
@@ -67,7 +75,6 @@ export const invoices = pgTable(
     status: invoiceStatusEnum('status').notNull(),
   },
 )
-
 export type Invoice = typeof invoices.$inferSelect;
 export type NewInvoice = typeof invoices.$inferInsert;
 
@@ -78,8 +85,7 @@ export const invoicesRelations = relations(invoices, ({ one }) => ({
   }),
 }));
 
-export const revenue = pgTable(
-  'revenue',
+export const revenue = pgTable('revenue',
   {
     month: varchar('month', { length: 4 }).notNull(),
     revenue: integer('revenue').notNull(),
@@ -90,6 +96,5 @@ export const revenue = pgTable(
     }
   }
 )
-
 export type Revenue = typeof revenue.$inferSelect;
 export type NewRevenue = typeof revenue.$inferInsert;

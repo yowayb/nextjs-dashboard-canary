@@ -10,7 +10,7 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 import * as schema from '@/db/schema';
-import { count, desc } from 'drizzle-orm';
+import { count, desc, eq } from 'drizzle-orm';
 const db = drizzle(sql, { schema });
 
 export async function fetchRevenue() {
@@ -193,6 +193,13 @@ export async function fetchFilteredClients(query: string) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch client table.');
   }
+}
+
+export async function fetchSites(client_id: string) {
+  unstable_noStore();
+  return await db.query.sites.findMany({
+    where: eq(schema.sites.client_id, client_id)
+  });
 }
 
 export async function getUser(email: string) {

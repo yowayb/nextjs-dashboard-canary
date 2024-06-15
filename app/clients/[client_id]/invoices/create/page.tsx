@@ -1,5 +1,5 @@
-import Form from '@/app/ui/invoices/create-form';
-import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import Form from '../components/invoices/create-form';
+import Breadcrumbs from '../components/invoices/breadcrumbs';
 import { fetchClients } from '@/app/lib/data';
 import { Metadata } from 'next';
 export const metadata: Metadata = {
@@ -12,10 +12,10 @@ export default async function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'Invoices', href: '/dashboard/invoices' },
+          { label: 'Invoices', href: '/clients/invoices' },
           {
             label: 'Create Invoice',
-            href: '/dashboard/invoices/create',
+            href: '/clients/invoices/create',
             active: true,
           },
         ]}

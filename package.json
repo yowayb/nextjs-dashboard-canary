@@ -21,6 +21,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.31.2",
+    "drizzle-zod": "^0.5.1",
     "next": "^14.2.3",
     "next-auth": "^5.0.0-beta.19",
     "postcss": "8.4.38",
