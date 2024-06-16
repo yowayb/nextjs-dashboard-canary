@@ -10,7 +10,6 @@ export default function AddSite({ client_id }: { client_id: string }) {
   const initialState: AddSiteState = { message: '', errors: {} };
   const addSiteWithClientId = addSite.bind(null, client_id);
   const [state, dispatch] = useActionState(addSiteWithClientId, initialState);
-  // TODO clear form on success
 
   return (
     <form action={dispatch}>
@@ -46,7 +45,6 @@ export default function AddSite({ client_id }: { client_id: string }) {
 }
 
 function URLInput() {
-  const [url, setUrl] = useState('');
   const { pending } = useFormStatus();
   return (
     <div>
@@ -58,12 +56,10 @@ function URLInput() {
       <input
         id="url"
         name="url"
-        type="text"
+        type="url"
         placeholder="https://example.com"
         className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
         aria-describedby="url-error"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
         required
         disabled={pending}
       />
