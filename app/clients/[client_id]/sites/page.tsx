@@ -1,7 +1,7 @@
 import { fetchSites } from "@/app/lib/data";
 import { Metadata } from "next";
 import AddSite from "./add";
-import { DeleteSiteButton } from "../../buttons";
+import DeleteSite from "./delete";
 
 export function generateMetadata({ params }: { params: { client_id: string }}): Metadata {
     return {
@@ -30,7 +30,7 @@ export default async function Page({ params }: { params: { client_id: string } }
                               <p>{site.url}</p>
                             </div>
                             <div className="flex items-center gap-3">
-                              <DeleteSiteButton clientId={params.client_id} url={site.url} />
+                              <DeleteSite client_id={params.client_id} url={site.url} />
                             </div>
                           </div>
                         </div>

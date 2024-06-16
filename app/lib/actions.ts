@@ -143,7 +143,7 @@ export type AddSiteState = {
   message?: string | null;
 };
 
-export async function addSite(client_id: string, prevState: AddSiteState | undefined, formData: FormData) {
+export async function addSite(client_id: string, prevState: AddSiteState, formData: FormData) {
   const rawFormData = {
     client_id: client_id,
     url: formData.get('url'),
@@ -151,14 +151,32 @@ export async function addSite(client_id: string, prevState: AddSiteState | undef
   const validatedFields = InsertSiteSchema.safeParse(rawFormData);
   if (!validatedFields.success) {
     return {
+      url: rawFormData.url?.toString(),
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Failed to add site because of field errors.',
     };
   }
 
-  await db.insert(schema.sites).values(validatedFields.data);
+  try {
+    await db.insert(schema.sites).values(validatedFields.data);
+  } catch (error: any) {
+    // https://github.com/drizzle-team/drizzle-orm/issues/376
+    if (error.code === '23505') {
+      return {
+        url: '',
+        errors: {
+          url: [`Site ${rawFormData.url} already exists.`],
+        }
+      };
+    } else {
+      console.log(error)
+    }
+  }
+
   revalidatePath(`/clients/${client_id}/sites`);
-  return { message: `Site "${rawFormData.url}" added.` };
+  return {
+    message: `Site "${rawFormData.url}" added.`
+  };
 }
 
 export async function deleteSite(client_id: string, url: string) {
