@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: { client_id: string } }
     const sites = await fetchSites(params.client_id);
     return (
       <div className="w-full">
-        <div className="mt-6 flow-root">
+        <div className="flow-root">
           <div className="overflow-x-auto">
             <div className="inline-block min-w-full align-middle">
               <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
@@ -23,9 +23,9 @@ export default async function Page({ params }: { params: { client_id: string } }
                       key={site.url}
                       className="mb-2 w-full rounded-md bg-white p-4"
                     >
-                      <div className="flex items-center justify-between border-b pb-4">
+                      <div className="flex items-center justify-between">
                         <div>
-                          <div className="mb-2 flex items-center">
+                          <div className="flex items-center">
                             <div className="flex items-center gap-3">
                               <p>{site.url}</p>
                             </div>

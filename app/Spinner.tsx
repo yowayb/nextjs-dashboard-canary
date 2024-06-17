@@ -1,6 +1,7 @@
 'use client';
-export function Spinner() {
+export function Spinner({ message }) {
   return (
+    <>
     <svg
       width="24"
       height="24"
@@ -19,5 +20,7 @@ export function Spinner() {
           repeatCount="indefinite" />
       </path>
     </svg>
+    {message}
+    </>
   );
 }

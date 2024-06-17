@@ -6,5 +6,6 @@ export const metadata: Metadata = {
 };
   
 export default function Page() {
+    // TODO new client modal form
     return <ClientsTable />
 }
