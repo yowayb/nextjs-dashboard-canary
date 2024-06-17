@@ -1,7 +1,8 @@
 'use client';
 export function Spinner({ message }) {
+export function Spinner({ message }) {
   return (
-    <>
+    <div className="flex">
     <svg
       width="24"
       height="24"
@@ -21,6 +22,6 @@ export function Spinner({ message }) {
       </path>
     </svg>
     {message}
-    </>
+    </div>
   );
 }
